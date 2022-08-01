@@ -68,21 +68,28 @@ function ListComponent({setLoggedin}) {
     setOpenConfirmation(false);
     setToBeDeleted('')
   };
-  
+
   return (
     <Grid>
         <AppBar position="relative">
             <Toolbar sx={{textAlign: 'right'}}>
                 <HighQualityIcon sx={{ mr: 2 }} />
                 <Button
-                type="submit"
                 variant="contained"
                 color="secondary"
                 sx={{ mt: 3, mb: 2 }}
                 onClick={() => setLoggedin(false)}
-              >
-                Sign Out
-              </Button>
+                >
+                    Sign Out
+                </Button>
+                <Button
+                variant="contained"
+                color="secondary"
+                sx={{ mt: 3, mb: 2 }}
+                onClick={fetchList}
+                >
+                    Refresh
+                </Button>
             </Toolbar>
         </AppBar>
         {isLoading ? <Box sx={{ display: 'flex', justifyContent: 'center'}}>
