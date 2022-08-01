@@ -1,5 +1,6 @@
 {
   "name": "website-heroku",
+  "homepage": "https://swordguard.github.io/ms-admin",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -46,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^4.0.0"
   }
 }
