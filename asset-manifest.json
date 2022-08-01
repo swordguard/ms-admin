@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ms-admin/static/css/main.e6c13ad2.css",
-    "main.js": "/ms-admin/static/js/main.47bdd97f.js",
+    "main.js": "/ms-admin/static/js/main.b1fbbc22.js",
     "index.html": "/ms-admin/index.html",
     "main.e6c13ad2.css.map": "/ms-admin/static/css/main.e6c13ad2.css.map",
-    "main.47bdd97f.js.map": "/ms-admin/static/js/main.47bdd97f.js.map"
+    "main.b1fbbc22.js.map": "/ms-admin/static/js/main.b1fbbc22.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.47bdd97f.js"
+    "static/js/main.b1fbbc22.js"
   ]
 }
