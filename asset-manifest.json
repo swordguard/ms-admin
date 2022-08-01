@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/ms-admin/static/css/main.e6c13ad2.css",
+    "main.js": "/ms-admin/static/js/main.47bdd97f.js",
+    "index.html": "/ms-admin/index.html",
+    "main.e6c13ad2.css.map": "/ms-admin/static/css/main.e6c13ad2.css.map",
+    "main.47bdd97f.js.map": "/ms-admin/static/js/main.47bdd97f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.47bdd97f.js"
+  ]
+}
