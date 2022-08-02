@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ListComponent from './components/ListComponent'
+import ListComponent, {TableComponent} from './components/ListComponent'
 import Login from './components/Login'
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -12,7 +12,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
         <CssBaseline />
-        {loggedin ? <ListComponent setLoggedin={setLoggedin}/> : <Login setLoggedin={setLoggedin}/>}
+        {loggedin ? <TableComponent setLoggedin={setLoggedin}/> : <Login setLoggedin={setLoggedin}/>}
     </ThemeProvider>
   );
 }

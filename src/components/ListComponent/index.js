@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useId} from 'react';
 import axios from 'axios'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -22,15 +22,26 @@ import HighQualityIcon from '@mui/icons-material/HighQuality';
 // import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import Grid from '@mui/material/Grid';
+import { DataGrid} from '@mui/x-data-grid';
+import uniqueId from 'lodash/uniqueId'
 
-function ListComponent({setLoggedin}) {
-  const [feedbackList, setFeedbackList] = useState([])
-  const [openConfirmation, setOpenConfirmation] = useState(false);
-  const [toBeDeleted, setToBeDeleted] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+const useTableStates = () => {
+    const [feedbackList, setFeedbackList] = useState([])
+    const [openConfirmation, setOpenConfirmation] = useState(false);
+    const [toBeDeleted, setToBeDeleted] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchList = () => {
+    return {
+        feedbackList, setFeedbackList,
+        openConfirmation, setOpenConfirmation,
+        toBeDeleted, setToBeDeleted,
+        isLoading, setIsLoading,
+        isDeleting, setIsDeleting
+    }
+}
+
+const fetchList = (setIsLoading, setFeedbackList) => {
     setIsLoading(true)
     axios.get(`${FEEDBACK_ENDPOINT}s`)
     .then(response => {
@@ -46,11 +57,8 @@ function ListComponent({setLoggedin}) {
         setIsLoading(false)
     })
   }
-  useEffect(() => {
-    fetchList()
-  }, [])
-
-  const deleteRecordById = (id) => {
+  const deleteRecordById = ({setIsDeleting, id, fetchList, setOpenConfirmation}) => {
+    console.log(111,  setOpenConfirmation)
     setIsDeleting(true)
     id && axios.delete(`${FEEDBACK_ENDPOINT}/${id}`).then(() => {
         fetchList()
@@ -59,15 +67,29 @@ function ListComponent({setLoggedin}) {
     })
   }
 
-  const handleConfirmation = (e, id) => {
+  const handleConfirmation = (setOpenConfirmation,setToBeDeleted, id) => {
     setOpenConfirmation(true);
     setToBeDeleted(id)
   };
 
-  const handleClose = () => {
+  const handleClose = (setOpenConfirmation, setToBeDeleted) => {
     setOpenConfirmation(false);
     setToBeDeleted('')
   };
+
+function ListComponent({setLoggedin}) {
+  const {
+        feedbackList, setFeedbackList,
+        openConfirmation, setOpenConfirmation,
+        toBeDeleted, setToBeDeleted,
+        isLoading, setIsLoading,
+        isDeleting, setIsDeleting
+    } = useTableStates()
+  
+  useEffect(() => {
+    fetchList()
+  }, [])
+
 
   return (
     <Grid>
@@ -152,4 +174,112 @@ function ListComponent({setLoggedin}) {
   );
 }
 
+
+export const TableComponent = ({setLoggedin}) => {
+
+    const {
+        feedbackList, setFeedbackList,
+        openConfirmation, setOpenConfirmation,
+        toBeDeleted, setToBeDeleted,
+        isLoading, setIsLoading,
+        isDeleting, setIsDeleting
+    } = useTableStates()
+
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 50 ,valueGetter: () => uniqueId()},
+        { field: 'backupId', headerName: 'Time', width: 220,
+        valueGetter: (params) =>
+        new Date(Number(params.row.backupId.split('-')[0])).toUTCString()
+    },
+        {
+          field: 'fullName',
+          headerName: 'Full name',
+          description: 'This column has a value getter and is not sortable.',
+          sortable: false,
+          width: 160,
+          valueGetter: (params) =>
+            `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+        },
+        { field: 'email', headerName: 'Email', width: 200 },
+        { field: 'comments', headerName: 'Comments',width: 400 },
+        { field: '#', headerName: 'Action',width: 100, 
+        renderCell: (params) => <DeleteIcon onClick={() => handleConfirmation(setOpenConfirmation,setToBeDeleted, params.row.backupId)}/> },
+      ];
+      
+      const fetch = () => fetchList(setIsLoading, setFeedbackList)
+      useEffect(() => {
+        fetch()
+      }, [])
+
+      console.log(222, toBeDeleted)
+      const transformedList = feedbackList.map((feed) => {
+        const {backupId} = feed
+        return {
+            ...feed,
+            id: backupId,
+        }
+      })
+
+      return (
+        <Box sx={{ height: 400, width: '100%' }}>
+            <AppBar position="relative">
+            <Toolbar sx={{textAlign: 'right'}}>
+                <HighQualityIcon sx={{ mr: 2 }} />
+                <Button
+                variant="contained"
+                color="secondary"
+                sx={{ mt: 3, mb: 2 }}
+                onClick={() => setLoggedin(false)}
+                >
+                    Sign Out
+                </Button>
+                <Button
+                variant="contained"
+                color="secondary"
+                sx={{ mt: 3, mb: 2 }}
+                onClick={fetch}
+                >
+                    Refresh
+                </Button>
+            </Toolbar>
+        </AppBar>
+        {
+            isLoading ? <Box sx={{ display: 'flex', justifyContent: 'center'}}>
+            <CircularProgress />
+            </Box> :
+          <DataGrid
+            rows={transformedList}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            // checkboxSelection
+            disableSelectionOnClick
+          />
+        }
+          <Dialog
+                open={openConfirmation}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                {"Delete confirmation"}
+                </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Are you sure to delete it?
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={() => handleClose(setOpenConfirmation, setToBeDeleted)} disabled={isDeleting}>No</Button>
+                <Button onClick={() => deleteRecordById(
+                    {setIsDeleting, id: toBeDeleted, fetchList: fetch, setOpenConfirmation}
+                )} autoFocus value='Y' disabled={isDeleting}>
+                    Yes
+                </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+      );
+}
 export default ListComponent
